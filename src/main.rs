@@ -49,7 +49,7 @@ fn main() -> Result<(), Error> {
 
 fn fuzz<R: rand::Rng + ?Sized>(rng: &mut R, schema: &Schema) -> Value {
     match schema.form() {
-        Form::Empty => fuzz_null(),
+        Form::Empty => fuzz_any(rng),
         Form::Type(Type::Boolean) => fuzz_bool(rng),
         Form::Type(Type::Number) => fuzz_number(rng),
         Form::Type(Type::String) => fuzz_string(rng),
@@ -63,8 +63,8 @@ fn fuzz<R: rand::Rng + ?Sized>(rng: &mut R, schema: &Schema) -> Value {
     }
 }
 
-fn fuzz_null() -> Value {
-    Value::Null
+fn fuzz_any<R: rand::Rng + ?Sized>(rng: &mut R) -> Value {
+    vec![Value::Null, fuzz_bool(rng), fuzz_number(rng), fuzz_string(rng)].into_iter().choose(rng).unwrap()
 }
 
 fn fuzz_bool<R: rand::Rng + ?Sized>(rng: &mut R) -> Value {
